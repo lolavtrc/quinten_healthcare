@@ -1,8 +1,7 @@
 import streamlit as st
 import pandas as pd 
-import seaborn as sns
-import matplotlib.pyplot as plt
 import numpy as np 
+from utils.plotting import plot_treatments_pie_chart,plot_rates_histograms,plot_most_pair_of_words
 
 from utils.styles import title_style, paragraph_style
 from utils.function import process_dataframe
@@ -44,7 +43,7 @@ st.markdown(f"""
                 </ul>
                 """, unsafe_allow_html=True)
 
-tab1, tab2, tab3, tab4 = st.tabs(["The data","Comment Distribution", "Rating Distribution", "Words Pairs Analysis"])
+tab1, tab2, tab3, tab4 = st.tabs(["The data","Treatment Distribution", "Rating Distribution", "Words Pairs Analysis"])
 
 
 # Creating the figures from the data
@@ -94,20 +93,38 @@ with tab1:
                     use_container_width=True)
 
 with tab2:
-    rating_value = st.slider("Rating Value", min_value=0, max_value=10, step=1,key="Rating2")
-    dease_type = st.multiselect("Deases", data["Disease"].unique(),key="Deases2")
-    # Pie Chart Traitements - TBD Lola 
+    col1,col2,col3= st.columns(3)
+    rating_value = col2.slider("Rating Value", min_value=0, max_value=10, step=1,key="Rating2")
+
+    st.markdown("<hr style='height:15px; border:0px;'>",unsafe_allow_html=True)
+    
+    fig_treatment = plot_treatments_pie_chart(data,rate_filter= True if rating_value>0 else False ,rate_value=rating_value )
+    st.pyplot(fig_treatment)
 
 with tab3:
-    dease_type = st.multiselect("Deases", data["Disease"].unique(),key="Deases3")
-    treatment_type = st.multiselect("Treaments", data["Treatment name"].unique(),key="Treatment2")
-    # Histogramme - TBD Lola 
+    col1,col2,col3= st.columns([4,1,4])
+    dease_type = col1.multiselect("Deases", data["Disease"].unique(),key="Deases3")
+    treatment_type = col3.multiselect("Treaments", data["Treatment name"].unique(),key="Treatment2")
+
+    st.markdown("<hr style='height:15px; border:0px;'>",unsafe_allow_html=True)
+    
+    fig_rating = plot_rates_histograms(data[(data["Disease"].isin(dease_type)) & (data["Treatment name"].isin(treatment_type))],
+                                       treatment_filter=False)
+    st.pyplot(fig_rating)
 
 with tab4:
-    dease_type = st.multiselect("Deases", data["Disease"].unique(),key="Deases4")
-    treatment_type = st.multiselect("Treaments", data["Treatment name"].unique(), key="Treatment3")
-    rating_value = st.slider("Rating Value", min_value=0, max_value=10, step=1, key="Rating3")
-    # Most common word pairs - TBD Lola 
+    col1,col2,col3,col4= st.columns(4)
+    dease_type = col1.multiselect("Deases", data["Disease"].unique(),key="Deases4")
+    treatment_type = col2.multiselect("Treaments", data["Treatment name"].unique(), key="Treatment3")
+    rating_value = col3.slider("Rating Value", min_value=0, max_value=10, step=1, key="Rating3")
+    nb_inputs = col4.number_input("Number of pair", step=1, value=20)
+    
+    fig_pairs = plot_most_pair_of_words(data[(data["Disease"].isin(dease_type))& \
+                                             (data["Treatment name"].isin(treatment_type))& \
+                                             (data["rate"]>rating_value)],
+                                        n=nb_inputs)
+
+    st.pyplot(fig_pairs)
 
 
 
