@@ -2,16 +2,20 @@ import streamlit as st
 import pandas as pd 
 import seaborn as sns
 import matplotlib.pyplot as plt
+import numpy as np 
 
-from Utils.styles import title_style, paragraph_style
-from Utils.function import process_dataframe
+from utils.styles import title_style, paragraph_style
+from utils.function import process_dataframe
+
+# Page Configuration
 
 st.set_page_config(page_title="Quinten DataScience", layout="wide")
 
 data_raw = pd.read_csv("data/raw_data_healthcare.csv").drop("text_index",axis=1)
 data = process_dataframe(data_raw)
 
-# Top Page
+# Top of the Page
+
 st.markdown(title_style, unsafe_allow_html=True)
 st.markdown(paragraph_style, unsafe_allow_html=True)
 st.markdown('<h1 class="title">Quinten DataScience</h1>', unsafe_allow_html=True)
@@ -23,6 +27,7 @@ st.markdown(f"""<p class="paragraph"> This project aims to extract essential ins
                 which often require long-term medication. The goal is to assist a pharmaceutical company in understanding 
                 how its products are perceived by consumers and in identifying potential side effects.</p>""", unsafe_allow_html=True)
 
+# Project Presentation
 
 st.markdown('<h1 class="small-title">Project Objectives</h1>', unsafe_allow_html=True)
 
@@ -39,13 +44,23 @@ st.markdown(f"""
                 </ul>
                 """, unsafe_allow_html=True)
 
-tab1, tab2, tab3 = st.tabs(["The data", "Treatment Distribution", "Deases Distribution"])
+tab1, tab2, tab3, tab4 = st.tabs(["The data","Comment Distribution", "Rating Distribution", "Words Pairs Analysis"])
 
 
 # Creating the figures from the data
 
 with tab1:
     st.subheader("About the dataset under study:")
+    st.markdown("<hr style='height:15px; border:0px;'>",unsafe_allow_html=True)
+    #Add few data points
+
+    col1,col2,col3,col4,col5 = st.columns([2,3,1,3,2])
+    with col2:
+        st.metric(label="Number of deases treated", value=data["Disease"].nunique())
+        st.metric(label="Number of treatment", value=data["Treatment name"].nunique())
+    with col4:
+        st.metric(label="Total number of comments", value=len(data) )
+        st.metric(label="Avergage rating", value=np.round(data["rate"].mean(),2))
 
     st.markdown(f"""<p class="paragraph"> The dataset provides insights into patients' experiences with different treatments  
                     for various diseases. Each entry in the dataset represents an individual patient's feedback and includes several 
@@ -57,25 +72,42 @@ with tab1:
                     same active ingredient. Lastly, the `Disease` column specifies the condition that the treatment is intended for, 
                     such as Crohn's Disease or Rheumatoid Arthritis. This dataset is a valuable resource for analyzing the efficacy 
                     and side effects of various treatments across different diseases.</p>""", unsafe_allow_html=True)
+
     with st.expander("See the data"):
-        st.dataframe(data)
+        # Selectors
+        col1,col2,col3= st.columns(3)
+        rating_value = col1.slider("Rating Value", min_value=None, max_value=10, step=1, key="Rating1")
+        dease_type = col2.multiselect("Deases", 
+                                    data["Disease"].unique(),
+                                    key="Deases1",
+                                    default=data["Disease"].unique())
+        treatment_type = col3.multiselect("Treaments", 
+                                    data["Treatment name"].unique(),
+                                    key="Treatment1",
+                                    default=data["Treatment name"].unique())
+
+        st.markdown("<hr style='height:15px; border:0px;'>",unsafe_allow_html=True)
+
+        st.dataframe(data[(data["Disease"].isin(dease_type)) & 
+                          (data["Treatment name"].isin(treatment_type)) &
+                          (data["rate"] > rating_value)]['comment'],
+                    use_container_width=True)
 
 with tab2:
-    fig1 = plt.figure(figsize=(16, 8))
-    # Treatment Distribution
-    sns.countplot(data=data, x='Treatment name', order=data['Treatment name'].value_counts().index)
-    plt.title('Treatment Distribution')
-    plt.xlabel('')
-    plt.ylabel('Count')
-    st.pyplot(fig1)
+    rating_value = st.slider("Rating Value", min_value=0, max_value=10, step=1,key="Rating2")
+    dease_type = st.multiselect("Deases", data["Disease"].unique(),key="Deases2")
+    # Pie Chart Traitements - TBD Lola 
 
 with tab3:
-    fig2 = plt.figure(figsize=(16, 8))
-    # Disease Distribution
-    sns.countplot(data=data, x='Disease', order=data['Disease'].value_counts().index)
-    plt.title('Disease Distribution')
-    plt.xlabel('')
-    plt.ylabel('Count')
-    plt.xticks(rotation=45)
-    st.pyplot(fig2)
+    dease_type = st.multiselect("Deases", data["Disease"].unique(),key="Deases3")
+    treatment_type = st.multiselect("Treaments", data["Treatment name"].unique(),key="Treatment2")
+    # Histogramme - TBD Lola 
+
+with tab4:
+    dease_type = st.multiselect("Deases", data["Disease"].unique(),key="Deases4")
+    treatment_type = st.multiselect("Treaments", data["Treatment name"].unique(), key="Treatment3")
+    rating_value = st.slider("Rating Value", min_value=0, max_value=10, step=1, key="Rating3")
+    # Most common word pairs - TBD Lola 
+
+
 

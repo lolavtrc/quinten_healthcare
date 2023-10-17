@@ -3,12 +3,12 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from Utils.styles import title_style, paragraph_style
-from Utils.function import process_dataframe
+from utils.styles import title_style, paragraph_style
+from utils.function import process_dataframe
 
 st.set_page_config(page_title="Quinten DataScience | Sentiment Analysis", layout="wide")
 
-data_raw = pd.read_csv("raw_data_healthcare.csv").drop("text_index",axis=1)
+data_raw = pd.read_csv("./data/raw_data_healthcare.csv").drop("text_index",axis=1)
 data = process_dataframe(data_raw)
 
 # Top Page
