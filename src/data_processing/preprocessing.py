@@ -2,6 +2,7 @@ import re
 import nltk
 import string
 import pandas as pd
+from nltk.corpus import wordnet
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
@@ -12,15 +13,19 @@ lemmatizer = WordNetLemmatizer()
 def clean_comment(row):
     # Lower comments
     comment = row['comment'].lower() 
+    
     # Delete ponctuation
     comment = ''.join([char for char in comment if char not in string.punctuation]) 
     words = comment.split() 
+    
     # Delete stop words (english)
     stop_words = set(stopwords.words('english')) 
     words = [word for word in words if word not in stop_words]
+    
     # Lemmatize the words
     lemmatizer = WordNetLemmatizer()
-    words = [lemmatizer.lemmatize(word) for word in words]
+    words = [lemmatizer.lemmatize(word, pos='v') for word in words]
+
     cleaned_comment = ' '.join(words) 
     return cleaned_comment
 
@@ -52,7 +57,10 @@ def process_dataframe(df):
         'crohns disease maintenance': 'disease',
         'psoriatic arthritis': 'disease',
         'ankylosing spondylitis': 'disease',
+        'ankylose spondylitis': 'disease',
         'ulcerative colitis maintenance': 'disease',
+        'psoriasis': 'disease',
+        'Psoriasis': 'disease',
         'crohn': 'disease',
         "chron's": 'disease',
         'crohns': 'disease',
