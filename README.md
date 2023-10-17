@@ -2,6 +2,10 @@
 
 **Project**: Analysis of Medication Reviews for Intestinal Diseases
 
+### For Installation
+
+Please refer to the Mkdocs website or go directly to docs/installation.md.
+
 ### Introduction
 
 This project aims to extract essential insights from a dataset of consumer reviews about medications used to treat intestinal diseases, such as Crohn's disease and colitis, which often require long-term medication. The goal is to assist a pharmaceutical company in understanding how its products are perceived by consumers and in identifying potential side effects.
