@@ -22,6 +22,43 @@ def train_nlp_model(df):
 
     return sentiment_analyzer, df
 
+def plot_sentiment_distribution(csv_file):
+    """
+    Plot a pie chart to visualize the distribution of sentiment values in a CSV file.
+
+    Parameters:
+    csv_file (str): Path to the CSV file containing the data. The CSV file should have a 'sentiment' column.
+
+    Returns:
+    None
+
+    Example:
+    plot_sentiment_distribution('your_data.csv')
+    """
+    try:
+        # Read the CSV file into a DataFrame
+        df = pd.read_csv(csv_file)
+
+        # Check if 'sentiment' column exists in the DataFrame
+        if 'sentiment' not in df.columns:
+            raise ValueError("The 'sentiment' column does not exist in the CSV file.")
+
+        # Count the number of unique values in the 'sentiment' column
+        sentiment_counts = df['sentiment'].value_counts()
+
+        # Create a pie chart
+        plt.figure(figsize=(8, 8))
+        plt.pie(sentiment_counts, labels=sentiment_counts.index, autopct='%1.1f%%', startangle=140, colors=plt.cm.Paired(range(len(sentiment_counts))))
+
+        # Add a title
+        plt.title('Sentiment Distribution')
+
+        # Display the pie chart
+        plt.show()
+
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+
 class StemmedCountVectorizer(CountVectorizer):
     """
     A custom CountVectorizer that stems words using an English Snowball stemmer during tokenization.
