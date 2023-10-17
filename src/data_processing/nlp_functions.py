@@ -1,26 +1,61 @@
-def train_nlp_model(df):
+import pandas as pd
+import matplotlib.pyplot as plt
+from transformers import pipeline
+from sklearn.feature_extraction.text import CountVectorizer
+from nltk.stem import SnowballStemmer
+from sentence_transformers import SentenceTransformer
+from hdbscan import HDBSCAN
+from BERTopic import BERTopic
+from BERTopic.transformer import ClassTfidfTransformer
+from sklearn.feature_extraction.text import CountVectorizer
+from nltk.corpus import stopwords
+
+
+def train_nlp_model(csv_file):
     """
-    From a dataframe with the column of comments, we train a sentiment analysis
-    pipeline from HuggingFace.
-    Returns the model as well as the dataframe with 2 added columns:
-    sentiment, the label of classification
-    score, the associated probablity to the label
+    Train a sentiment analysis model from HuggingFace using comments from a DataFrame.
+
+    Parameters:
+    csv_file (str): Path to the CSV file containing the comments.
+
+    Returns:
+    tuple: A tuple containing two elements:
+        - sentiment_analyzer: The sentiment analysis model.
+        - df (pd.DataFrame): The DataFrame with two added columns: 'sentiment' (classification label) and 'sentiment_score' (associated probability).
+
+    Example:
+    sentiment_analyzer, analyzed_df = train_nlp_model('comments_data.csv')
     """
-    # Using Huggingface's pipeline for sentiment analysis
-    sentiment_analyzer = pipeline("sentiment-analysis")
+    try:
+        # Read the CSV file into a DataFrame
+        df = pd.read_csv(csv_file)
 
-    # Perform sentiment analysis and add results to the DataFrame
-    sentiment_results = sentiment_analyzer(df["comment"].tolist())
+        # Check if 'cleaned_comment' column exists in the DataFrame
+        if 'cleaned_comment' not in df.columns:
+            raise ValueError("The 'cleaned_comment' column does not exist in the CSV file.")
 
-    # Extract sentiment labels and scores
-    sentiment_labels = [entry['label'] for entry in sentiment_results]
-    sentiment_scores = [entry['score'] for entry in sentiment_results]
+        # Using Huggingface's pipeline for sentiment analysis
+        sentiment_analyzer = pipeline("sentiment-analysis")
 
-    # Add the sentiment label and score as new columns to the DataFrame
-    df['sentiment'] = sentiment_labels
-    df['sentiment_score'] = sentiment_scores
+        # Perform sentiment analysis and add results to the DataFrame
+        sentiment_results = sentiment_analyzer(df["cleaned_comment"].tolist())
 
-    return sentiment_analyzer, df
+        # Extract sentiment labels and scores
+        sentiment_labels = [entry['label'] for entry in sentiment_results]
+        sentiment_scores = [entry['score'] for entry in sentiment_results]
+
+        # Add the sentiment label and score as new columns to the DataFrame
+        df['sentiment'] = sentiment_labels
+        df['sentiment_score'] = sentiment_scores
+
+        return sentiment_analyzer, df
+
+    except FileNotFoundError:
+        print(f"Error: The file '{csv_file}' does not exist.")
+        return None, None
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        return None, None
 
 def plot_sentiment_distribution(csv_file):
     """
