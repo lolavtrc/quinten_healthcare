@@ -174,3 +174,30 @@ def plot_most_pair_of_words(df, n=20):
     plt.title(f'Top {n} Most Common Words', fontsize=16)
     
     return fig
+
+
+def plot_sentiment_distribution(df):
+    """
+    Plot a pie chart to visualize the distribution of sentiment values in a CSV file.
+    Parameters:
+    csv_file (str): Path to the CSV file containing the data. The CSV file should have a 'sentiment' column.
+    Returns:
+    None
+    Example:
+    plot_sentiment_distribution('your_data.csv')
+    """
+    try:
+        # Check if 'sentiment' column exists in the DataFrame
+        if 'sentiment' not in df.columns:
+            raise ValueError("The 'sentiment' column does not exist in the CSV file.")
+        # Count the number of unique values in the 'sentiment' column
+        sentiment_counts = df['sentiment'].value_counts()
+        # Create a pie chart
+        figure_sentiment = plt.figure(figsize=(8, 8))
+        plt.pie(sentiment_counts, labels=sentiment_counts.index, autopct='%1.1f%%', startangle=140, colors=plt.cm.Paired(range(len(sentiment_counts))))
+        # Add a title
+        plt.title('Sentiment Distribution')
+        # Return the pie chart
+        return figure_sentiment
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
