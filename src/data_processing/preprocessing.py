@@ -18,10 +18,10 @@ def clean_comment(row):
     # Delete stop words (english)
     stop_words = set(stopwords.words('english')) 
     words = [word for word in words if word not in stop_words]
-    cleaned_comment = ' '.join(words) 
     # Lemmatize the words
     lemmatizer = WordNetLemmatizer()
     words = [lemmatizer.lemmatize(word) for word in words]
+    cleaned_comment = ' '.join(words) 
     return cleaned_comment
 
 def process_dataframe(df):
