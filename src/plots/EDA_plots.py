@@ -215,7 +215,7 @@ def word_tokenization(row):
     - Uses NLTK for word tokenization.
     """
     comment = row['cleaned_comment'].lower()
-    words = nltk.word_tokenize(comment)  # Tokenization
+    words = nltk.word_tokenize(comment)  
     return words
 
 def create_word_pairs(row):
@@ -264,26 +264,6 @@ def generate_frequencies_dataframes(df):
     return df
 
 def plot_most_common_unique_words(df, n=20):
-    """
-    Plot a horizontal bar chart of the most common unique words in the DataFrame.
-
-    Parameters:
-    -----------
-    df : pd.DataFrame
-        The input DataFrame containing tokenized data.
-
-    n : int, optional
-        The number of top words to display in the chart. Default is 20.
-
-    Returns:
-    --------
-    None
-
-    Notes:
-    ------
-    - Generates a bar chart to visualize the frequency of the top unique words.
-    - Filters out specific words and characters from the analysis.
-    """
     df = df.copy()
     df = generate_frequencies_dataframes(df)
     all_words = [word for word_list in df['tokenized_comment'] for word in word_list]
@@ -299,7 +279,6 @@ def plot_most_common_unique_words(df, n=20):
     top_frequencies = frequencies[:n]
     colors = plt.cm.rainbow(np.linspace(0, 1, n))
     
-    # Plot the horizontal bar chart with rainbow colors
     plt.figure(figsize=(8, 6))
     plt.barh(top_words, top_frequencies, color=colors)
     plt.xlabel('Frequency', fontsize=14)
@@ -351,7 +330,6 @@ def plot_most_pair_of_words(df, n=20):
     top_words, top_frequencies = zip(*top_word_pairs)
     colors = plt.cm.rainbow(np.linspace(0, 1, n))
     
-    # Plot the horizontal bar chart with rainbow colors
     plt.figure(figsize=(8, 6))
     plt.barh(top_words, top_frequencies, color=colors)
     plt.xlabel('Frequency', fontsize=14)
