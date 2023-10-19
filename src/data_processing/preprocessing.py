@@ -1,8 +1,6 @@
 import re
 import nltk
 import string
-import pandas as pd
-from nltk.corpus import wordnet
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
@@ -13,7 +11,7 @@ lemmatizer = WordNetLemmatizer()
 def clean_comment(row):
     # Lower comments
     comment = row['comment'].lower() 
-    
+
     # Delete ponctuation
     comment = ''.join([char for char in comment if char not in string.punctuation]) 
     words = comment.split() 
@@ -30,7 +28,7 @@ def clean_comment(row):
     return cleaned_comment
 
 def process_dataframe(df):
-
+    # Function applied to preprocess the raw dataframe
     df = df.copy()
 
     if 'comment' not in df.columns:
@@ -41,7 +39,7 @@ def process_dataframe(df):
 
     df['cleaned_comment'] = df.apply(clean_comment, axis=1)
 
-    # Extracting treatment name, treatment code, and disease name
+    # Extracting treatment name, treatment code, and disease name from 'medication' column
     pattern = r'(?P<treatment_name>.+?) (?P<treatment_code>.+?) for (?P<disease_name>.+?)( Maintenance)?$'
     extracted_data = df['medication'].str.extract(pattern)
     df['Treatment name'] = extracted_data['treatment_name']
@@ -64,6 +62,7 @@ def process_dataframe(df):
         'crohn': 'disease',
         "chron's": 'disease',
         'crohns': 'disease',
+        
         # Treatment code replacements
         'infliximab': 'treatment_code',
         'adalimumab': 'treatment_code',
@@ -73,6 +72,7 @@ def process_dataframe(df):
         'vedolizumab': 'treatment_code',
         'ustekinumab': 'treatment_code',
         'natalizumab': 'treatment_code',
+        
         # Treatment name replacements
         'inflectra': 'treatment_name',
         'remicade': 'treatment_name',
@@ -85,7 +85,7 @@ def process_dataframe(df):
         'tysabri': 'treatment_name'
     }
     
-    # Appliquez les remplacements dans la colonne 'cleaned_comment' en utilisant le dictionnaire
+    # Apply replacements for the 'cleaned_comment' column using the dictionnary
     df['cleaned_comment'] = df['cleaned_comment'].replace(replacement_dict, regex=True)
 
     return df

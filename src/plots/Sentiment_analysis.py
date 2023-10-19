@@ -7,9 +7,10 @@ from nltk.tokenize import word_tokenize
 from nltk import pos_tag
 
 # The two functions takes as input the csv located in data/sorted_feelings.csv
+# Which contains the Results dataframe of the aspect-based sentiment analysis
 
 ##################################################################################################
-# First Plot : Most represented topics 
+# First Plot : Most represented aspects 
 ##################################################################################################
 def create_tree_map(df):
     df = df.copy()
@@ -53,14 +54,13 @@ def classify_feelings(word_list):
     negative_feelings = []
     other_feelings = []
 
-    # Possible values for sentiments : 
+    # Some possible values for sentiments that might not be detected or misclassified by TextBlob library
     neg_feelings = ['hairloss', 'headache', 'weightgain', 'treatment', 'thinner', 'gain', 'vomit',  'disappoint', 'nausea', 'cramp', 'regain', 
                     'loss', 'pain', 'body', 'skin', 'fatigue', 'hair', 'sideeffect', 'weight', 'energy', 
                     'diarrhea', 'legs', 'nausea', 'stomachpain', 'infections', 'sideeffects', 'constipation', 'ribpain', 'lesions', 'worsen']
     pos_feelings = ['improvement', 'eyebrow', 'stable', 'increase', 'help'] 
 
     for word in word_list:
-        # Vérifiez si le mot est dans les listes neg_feelings ou pos_feelings
         if word in neg_feelings:
             negative_feelings.append(word)
         elif word in pos_feelings:
