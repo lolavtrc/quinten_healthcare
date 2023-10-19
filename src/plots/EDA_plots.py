@@ -10,6 +10,31 @@ import matplotlib.pyplot as plt
 ##################################################################################################
 
 def generate_treatments_pie_chart_dataframe(df, rate_filter=False, rate_value=1):
+    """
+    Generate a DataFrame for pie chart visualization of treatments and their counts.
+
+    Parameters:
+    -----------
+    df : pd.DataFrame
+        The input DataFrame containing treatment data.
+
+    rate_filter : bool, optional
+        If True, filter the DataFrame based on a specific 'rate' value. Default is False.
+
+    rate_value : int, optional
+        The value to filter the DataFrame by 'rate' if rate_filter is set to True. Default is 1.
+
+    Returns:
+    --------
+    pd.DataFrame
+        A DataFrame with columns 'Treatment name', 'Rate' (if rate_filter is True), 'count', and 'percentage'.
+
+    Notes:
+    ------
+    - The function drops unnecessary columns from the input DataFrame.
+    - If rate_filter is False, it calculates counts and percentages for all treatments.
+    - If rate_filter is True, it filters the DataFrame by rate_value and calculates counts and percentages.
+    """
     df = df.copy()
     columns_to_drop = ['text_index', 'medication', 'comment', 'cleaned_comment', 'Treatment code', 'Disease']
     df.drop(columns=columns_to_drop, inplace=True)
@@ -37,6 +62,30 @@ def generate_treatments_pie_chart_dataframe(df, rate_filter=False, rate_value=1)
 def plot_treatments_pie_chart(df, 
                             rate_filter=False, 
                             rate_value=3):
+    """
+    Plot a pie chart to visualize the distribution of treatments in the provided DataFrame.
+
+    Parameters:
+    -----------
+    df : pd.DataFrame
+        The input DataFrame containing treatment data.
+
+    rate_filter : bool, optional
+        If True, filter the DataFrame based on a specific 'rate' value. Default is False.
+
+    rate_value : int, optional
+        The value to filter the DataFrame by 'rate' if rate_filter is set to True. Default is 3.
+
+    Returns:
+    --------
+    None (plt.show)
+
+    Notes:
+    ------
+    - Calls the 'generate_treatments_pie_chart_dataframe' function to create the necessary data.
+    - Uses a pie chart to visualize the treatment distribution.
+    - If rate_filter is True, the chart will be labeled with the specified rate value.
+    """
     df_to_plot = generate_treatments_pie_chart_dataframe(df, 
                                         rate_filter=rate_filter, 
                                         rate_value=rate_value)
@@ -63,7 +112,30 @@ def plot_treatments_pie_chart(df,
 ##################################################################################################
 
 def generate_rating_charts(df, treatment_filter=False, treatment_value='inflectra'):
-    
+    """
+    Filter and preprocess the DataFrame for generating rating-related charts or visualizations.
+
+    Parameters:
+    -----------
+    df : pd.DataFrame
+        The input DataFrame containing rating data.
+
+    treatment_filter : bool, optional
+        If True, filter the DataFrame based on a specific 'Treatment name'. Default is False.
+
+    treatment_value : str, optional
+        The treatment name to filter the DataFrame if treatment_filter is set to True. Default is 'inflectra'.
+
+    Returns:
+    --------
+    pd.DataFrame
+        A DataFrame with selected columns after applying any optional filters.
+
+    Notes:
+    ------
+    - The function drops unnecessary columns from the input DataFrame.
+    - If treatment_filter is True, it filters the DataFrame by the specified treatment name.
+    """
     df = df.copy()
     columns_to_drop = ['text_index', 'medication', 'comment', 'cleaned_comment', 'Treatment code', 'Disease']
     df.drop(columns=columns_to_drop, inplace=True)
@@ -76,6 +148,30 @@ def generate_rating_charts(df, treatment_filter=False, treatment_value='inflectr
 def plot_rates_histograms(df, 
                         treatment_filter=False, 
                         treatment_value='inflectra'):
+    """
+    Generate a histogram to visualize the distribution of ratings in the provided DataFrame.
+
+    Parameters:
+    -----------
+    df : pd.DataFrame
+        The input DataFrame containing rating data.
+
+    treatment_filter : bool, optional
+        If True, filter the DataFrame based on a specific 'Treatment name'. Default is False.
+
+    treatment_value : str, optional
+        The treatment name to filter the DataFrame if treatment_filter is set to True. Default is 'inflectra'.
+
+    Returns:
+    --------
+    None
+
+    Notes:
+    ------
+    - Calls the 'generate_rating_charts' function to preprocess the data.
+    - Creates a histogram to visualize the distribution of ratings.
+    - If treatment_filter is True, the chart will be labeled with the specified treatment name.
+    """
     df_to_plot = generate_rating_charts(df, 
                                         treatment_filter=treatment_filter, 
                                         treatment_value=treatment_value)
@@ -101,22 +197,93 @@ def plot_rates_histograms(df,
 ##################################################################################################
 
 def word_tokenization(row):
+    """
+    Tokenize a cleaned comment into a list of words.
+
+    Parameters:
+    -----------
+    row : pd.Series
+        A row from the DataFrame containing a 'cleaned_comment' column.
+
+    Returns:
+    --------
+    list of str
+        A list of words extracted from the 'cleaned_comment' in lowercase.
+
+    Notes:
+    ------
+    - Uses NLTK for word tokenization.
+    """
     comment = row['cleaned_comment'].lower()
     words = nltk.word_tokenize(comment)  # Tokenization
     return words
 
 def create_word_pairs(row):
+    """
+    Create word pairs from a list of tokenized words in a row.
+
+    Parameters:
+    -----------
+    row : pd.Series
+        A row from the DataFrame containing a 'tokenized_comment' column.
+
+    Returns:
+    --------
+    list of str
+        A list of word pairs created from the 'tokenized_comment'.
+
+    Notes:
+    ------
+    - Creates word pairs by combining adjacent words in the tokenized comment.
+    """
     tokenized_comment = row['tokenized_comment']
     word_pairs = [" ".join([tokenized_comment[i], tokenized_comment[i+1]]) for i in range(len(tokenized_comment) - 1)]
     return word_pairs
 
 def generate_frequencies_dataframes(df):
+    """
+    Preprocess the DataFrame to include tokenized comments and word pairs.
+
+    Parameters:
+    -----------
+    df : pd.DataFrame
+        The input DataFrame containing data for analysis.
+
+    Returns:
+    --------
+    pd.DataFrame
+        A DataFrame with 'tokenized_comment' and 'word_pairs' columns.
+
+    Notes:
+    ------
+    - Tokenizes the cleaned comments and creates word pairs for analysis.
+    """
     df = df.copy()
     df['tokenized_comment'] = df.apply(word_tokenization, axis=1) 
     df['word_pairs'] = df.apply(create_word_pairs, axis=1) 
     return df
 
 def plot_most_common_unique_words(df, n=20):
+    """
+    Plot a horizontal bar chart of the most common unique words in the DataFrame.
+
+    Parameters:
+    -----------
+    df : pd.DataFrame
+        The input DataFrame containing tokenized data.
+
+    n : int, optional
+        The number of top words to display in the chart. Default is 20.
+
+    Returns:
+    --------
+    None
+
+    Notes:
+    ------
+    - Generates a bar chart to visualize the frequency of the top unique words.
+    - Filters out specific words and characters from the analysis.
+    """
     df = df.copy()
     df = generate_frequencies_dataframes(df)
     all_words = [word for word_list in df['tokenized_comment'] for word in word_list]
@@ -141,6 +308,26 @@ def plot_most_common_unique_words(df, n=20):
     plt.show()
 
 def plot_most_pair_of_words(df, n=20):
+    """
+    Plot a horizontal bar chart of the most common word pairs in the DataFrame.
+
+    Parameters:
+    -----------
+    df : pd.DataFrame
+        The input DataFrame containing word pairs.
+
+    n : int, optional
+        The number of top word pairs to display in the chart. Default is 20.
+
+    Returns:
+    --------
+    None
+
+    Notes:
+    ------
+    - Generates a bar chart to visualize the frequency of the top word pairs.
+    - Filters out specific word pairs from the analysis.
+    """
     df = df.copy()
     df = generate_frequencies_dataframes(df)
 

@@ -7,3 +7,5 @@ sentence_transformers
 bertopic
 shap
 stanza
+plotly
+TextBlob
